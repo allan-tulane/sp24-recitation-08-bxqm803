@@ -1,48 +1,70 @@
 from collections import deque
-from heapq import heappush, heappop 
+from heapq import heappush, heappop
+
 
 def shortest_shortest_path(graph, source):
-    """
-    Params: 
-      graph.....a graph represented as a dict where each key is a vertex
-                and the value is a set of (vertex, weight) tuples (as in the test case)
-      source....the source node
-      
-    Returns:
-      a dict where each key is a vertex and the value is a tuple of
-      (shortest path weight, shortest path number of edges). See test case for example.
-    """
-    ### TODO
-    pass
-    
 
-    
-    
+  visited = {source: (0, 0)}
+  queue = deque([(source)])
+  while queue:
+    current = queue.popleft()
+
+    distance, edges = visited[current]
+
+    for neighbor, weight in graph[current]:
+      new_distance = distance + weight
+      new_edges = edges + 1
+      if neighbor not in visited:
+        visited[neighbor] = (new_distance, new_edges)
+        queue.append(neighbor)
+      else:
+        if new_distance < visited[neighbor][0]:
+          visited[neighbor] = (new_distance, new_edges)
+        elif new_distance == visited[neighbor][0] and new_edges < visited[
+            neighbor][1]:
+          visited[neighbor] = (new_distance, new_edges)
+        else:
+          continue
+  return visited
+
+
 def bfs_path(graph, source):
-    """
-    Returns:
-      a dict where each key is a vertex and the value is the parent of 
-      that vertex in the shortest path tree.
-    """
-    ###TODO
-    pass
+
+  queue = deque([source])
+  visited = {source: " "}
+
+  while queue:
+    current = queue.popleft()
+    for neighbor in graph[current]:
+      if neighbor not in visited:
+        visited[neighbor] = current
+        queue.append(neighbor)
+
+  return visited
+
 
 def get_sample_graph():
-     return {'s': {'a', 'b'},
-            'a': {'b'},
-            'b': {'c'},
-            'c': {'a', 'd'},
-            'd': {}
-            }
+  return {'s': {'a', 'b'}, 'a': {'b'}, 'b': {'c'}, 'c': {'a', 'd'}, 'd': {}}
 
 
-    
 def get_path(parents, destination):
-    """
-    Returns:
-      The shortest path from the source node to this destination node 
-      (excluding the destination node itself). See test_get_path for an example.
-    """
-    ###TODO
-    pass
 
+  path = []
+  current = destination
+  while not current == " ":
+    path.append(current)
+    current = parents[current]
+
+  path = path[1:]
+  path = reversed(path)
+  return ''.join(path)
+
+
+graph = {
+            's': {('a', 1), ('c', 4)},
+            'a': {('b', 2)}, # 'a': {'b'},
+            'b': {('c', 1), ('d', 4)}, 
+            'c': {('d', 3)},
+            'd': {},
+            'e': {('d', 0)}
+        }
